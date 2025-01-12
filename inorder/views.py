@@ -5,12 +5,10 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.shortcuts import render, redirect
-
 # Create your views here.
 from django.urls import reverse
 
 from common.models import Inorder, User, InorderClothes, Customer
-
 from inorder.forms import InorderForm, InorderClothesForm, EditmoreForm
 
 
@@ -30,14 +28,12 @@ def add(request):
     if request.method == "POST":
         inorder_form = InorderForm(request.POST)
         if inorder_form.is_valid():
-            costomer = inorder_form.cleaned_data['customer']
+            # costomer = inorder_form.cleaned_data['customer']
             uid = request.session.get('user_id')
             user = User.objects.get(id=uid)
             now = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
             code = 'IN' + now + str(random.randint(10000, 99999))
-            new_inorder = Inorder.objects.create(code=code,
-                                                 customer=costomer,
-                                                 user=user)
+            new_inorder = Inorder.objects.create(code=code,user=user)
             context = {
                 'id': new_inorder.id
             }
@@ -113,7 +109,6 @@ def update(request, inorder_id):
     else:
         inorder_form = InorderForm({'id': inorder.id,
                                     'code': inorder.code,
-                                    'customer': inorder.customer,
                                     'user': inorder.user,
                                     'create_time': inorder.create_time})
         context = {
@@ -137,15 +132,15 @@ def delete(request, inorder_id):
 
 def detail(request, inorder_id):
     # 返回一个 QuerySet 对象 ，包含所有的表记录
-    qs1 = Inorder.objects.filter(id=inorder_id)
-    qs2 = InorderClothes.objects.filter(inorder_id=inorder_id)
-    sum = 0
-    for foo in qs2:
-        sum += foo.clothes.price * foo.amount
+    inorder_list = Inorder.objects.filter(id=inorder_id)
+    inorder_clothes_list = InorderClothes.objects.filter(inorder_id=inorder_id)
+    sum_price = 0
+    for foo in inorder_clothes_list:
+        sum_price += foo.clothes.price * foo.amount
     context = {
-        'qs1': qs1,
-        'qs2': qs2,
-        'sum': sum,
+        'inorder_list': inorder_list,
+        'inorder_clothes_list': inorder_clothes_list,
+        'sum_price': sum_price,
         'inorder_id': inorder_id
     }
     return render(request, 'inorder/detail.html', context)
@@ -153,13 +148,13 @@ def detail(request, inorder_id):
 
 def addmore(request, inorder_id):
     if request.method == "POST":
-        inorderclothes_form = InorderClothesForm(request.POST)
-        if inorderclothes_form.is_valid():
-            clothes = inorderclothes_form.cleaned_data['clothes']
-            amount = inorderclothes_form.cleaned_data['amount']
+        inorder_clothes_form = InorderClothesForm(request.POST)
+        if inorder_clothes_form.is_valid():
+            clothes = inorder_clothes_form.cleaned_data['clothes']
+            amount = inorder_clothes_form.cleaned_data['amount']
 
             with transaction.atomic():  # 事务
-                new_inorderclothes = InorderClothes.objects.create(clothes=clothes,
+                new_inorder_clothes = InorderClothes.objects.create(clothes=clothes,
                                                                    inorder_id=inorder_id,
                                                                    amount=amount)
                 # 入库增加库存
@@ -167,22 +162,22 @@ def addmore(request, inorder_id):
                 clothes.save()
 
             context = {
-                'id': new_inorderclothes.id
+                'id': new_inorder_clothes.id
             }
             messages.add_message(request, messages.SUCCESS, '添加成功')
             return redirect(reverse('inorder:detail', args={inorder_id}))
 
         else:
             context = {
-                'inorderclothes_form': inorderclothes_form,
+                'inorder_clothes_form': inorder_clothes_form,
                 'inorder_id': inorder_id
             }
             messages.add_message(request, messages.WARNING, '请检查填写的内容')
             return render(request, 'inorder/addmore.html', context)
     else:
-        inorderclothes_form = InorderClothesForm()
+        inorder_clothes_form = InorderClothesForm()
         context = {
-            'inorderclothes_form': inorderclothes_form,
+            'inorder_clothes_form': inorder_clothes_form,
             'inorder_id': inorder_id
         }
         return render(request, 'inorder/addmore.html', context)

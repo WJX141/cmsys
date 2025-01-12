@@ -62,7 +62,11 @@ class Clothes(models.Model):
     name = models.CharField(max_length=32, verbose_name='服装名')
     # 服装号
     sn = models.CharField(max_length=32, unique=True, verbose_name='服装号')
-    # 价格
+    # 成本单价
+    # cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='成本')
+    # 成本总价
+    # cost_total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='成本总价')
+    # 销售价格
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='价格')
     # 尺寸
     size = models.CharField(max_length=32, choices=size_choices, verbose_name='尺寸')
@@ -91,8 +95,6 @@ class Clothes(models.Model):
 class Inorder(models.Model):
     # 入库单号
     code = models.CharField(max_length=32, verbose_name='入库单号')
-    # 客户
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, verbose_name='客户')
     # 用户
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
     # 入库单里的服装，和Clothes表是多对多的关系
@@ -158,6 +160,8 @@ class OutorderClothes(models.Model):
     clothes = models.ForeignKey(Clothes, on_delete=models.CASCADE, verbose_name='服装')
     # 出库单中服装的数量
     amount = models.PositiveIntegerField(verbose_name='数量')
+    # 折扣
+    # discount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='折扣')
 
     def __str__(self):
         return self.clothes.name

@@ -6,7 +6,7 @@ from common.models import Customer, User, Outorder, Clothes
 class OutorderForm(forms.Form):
     id = forms.IntegerField(label='ID', required=False,
                             widget=forms.TextInput({'class': 'form-control', 'disabled': 'disabled'}))
-    code = forms.CharField(label='入库单号', required=False, max_length=32,
+    code = forms.CharField(label='出库单号', required=False, max_length=32,
                            widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     customer = forms.ModelChoiceField(label='客户', queryset=Customer.objects.all(),

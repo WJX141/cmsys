@@ -29,6 +29,7 @@ def list(request):
 
 def add(request):
     if request.method == "POST":
+        next_url = request.POST.get('next', None)
         clothes_form = ClothesForm(request.POST)
         if clothes_form.is_valid():
             name = clothes_form.cleaned_data['name']
@@ -46,10 +47,9 @@ def add(request):
                                                  color=color,
                                                  stock=stock,
                                                  desc=desc)
-            context = {
-                'id': new_clothes.id,
-            }
             messages.add_message(request, messages.SUCCESS, '添加成功')
+            if next_url:
+                return redirect(next_url)
             return redirect('/clothes/')
 
         else:
@@ -61,8 +61,11 @@ def add(request):
     else:
         clothes_form = ClothesForm()
         context = {
-            'clothes_form': clothes_form
+            'clothes_form': clothes_form,
         }
+        next_url = request.GET.get('next', None)
+        if next_url:
+            context['next'] = next_url
         return render(request, 'clothes/add.html', context)
 
 

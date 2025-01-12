@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -42,8 +42,8 @@
                 <li><a href="{% url 'user:index' %}">用户管理</a></li>
                 <li><a href="{% url 'customer:index' %}">客户管理</a></li>
                 <li><a href="{% url 'clothes:index' %}">服装管理</a></li>
-                <li><a href="{% url 'inorder:index' %}">入库单管理</a></li>
-                <li><a href="{% url 'outorder:index' %}">出库单管理</a></li>
+                <li><a href="{% url 'inorder:index' %}">入库管理</a></li>
+                <li><a href="{% url 'outorder:index' %}">销售管理</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 {% if request.session.is_login %}
